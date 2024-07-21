@@ -22,6 +22,7 @@ CREATE TABLE San_pham_chi_tiet(
 	ten_san_pham_chi_tiet NVARCHAR(200),
 	so_luong INT,
 	don_gia MONEY,
+	anh NVARCHAR(50),
 	trang_thai INT
 );
 
@@ -250,16 +251,16 @@ VALUES
   (N'Đức', 1),
   (N'Ý', 1);
 
-INSERT INTO San_pham_chi_tiet (id_kich_thuoc, id_mau_sac, id_chat_lieu, id_da, id_san_pham, id_xuat_xu, ma_san_pham_chi_tiet, ten_san_pham_chi_tiet, so_luong, don_gia, trang_thai) 
-VALUES(1, 1, 1, 1, 1, 1, 'SPCT001', N'Vòng cổ vàng', 10, 2000000, 1),
-	(2, 2, 2, 2, 2, 2, 'SPCT002', N'Lắc tay bạc', 15, 1500000, 1),
-	(3, 3, 3, 3, 3, 3, 'SPCT003', N'Nhẫn kim cương', 5, 5000000, 0),
-	(4, 4, 4, 4, 4, 4, 'SPCT004', N'Khuyên tai bạc', 20, 1000000, 1),
-	(5, 5, 5, 5, 5, 5, 'SPCT005', N'Vòng chân đồng', 8, 1800000, 1),
-	(6, 6, 4, 1, 6, 6, 'SPCT006', N'Mặt dây chuyền titan', 12, 1200000, 1),
-	(7, 7, 3, 2, 7, 7, 'SPCT007', N'Bông tai bạch kim', 6, 3000000, 1),
-	(8, 8, 2, 3, 8, 8, 'SPCT008', N'Nhẫn cưới bạc', 10, 2500000, 1),
-	(9, 9, 1, 4, 9, 9, 'SPCT009', N'Lắc chân vàng', 9, 2200000, 1);
+INSERT INTO San_pham_chi_tiet (id_kich_thuoc, id_mau_sac, id_chat_lieu, id_da, id_san_pham, id_xuat_xu, ma_san_pham_chi_tiet, ten_san_pham_chi_tiet, so_luong, don_gia, anh, trang_thai) 
+VALUES(1, 1, 1, 1, 1, 1, 'SPCT001', N'Vòng cổ vàng', 10, 2000000, 'vong_co_vang.jpg', 1),
+	(2, 2, 2, 2, 2, 2, 'SPCT002', N'Lắc tay bạc', 15, 1500000, 'lac_tay_bac.jpg', 1),
+	(3, 3, 3, 3, 3, 3, 'SPCT003', N'Nhẫn kim cương', 5, 5000000, 'nhan_kim_cuong.jpg', 0),
+	(4, 4, 4, 4, 4, 4, 'SPCT004', N'Khuyên tai bạc', 20, 1000000, 'khuyen_tai_bac.jpg', 1),
+	(5, 5, 5, 5, 5, 5, 'SPCT005', N'Vòng chân đồng', 8, 1800000, 'vong_chan.jpg', 1),
+	(6, 6, 4, 1, 6, 6, 'SPCT006', N'Mặt dây chuyền titan', 12, 1200000, 'mat_day_chuyen.jpg', 1),
+	(7, 7, 3, 2, 7, 7, 'SPCT007', N'Bông tai bạch kim', 6, 3000000, 'bong_tai_bach_kim.jpg', 1),
+	(8, 8, 2, 3, 8, 8, 'SPCT008', N'Nhẫn cưới bạc', 10, 2500000, 'nhan_cuoi_bac.jpg', 1),
+	(9, 9, 1, 4, 9, 9, 'SPCT009', N'Lắc chân vàng', 9, 2200000, 'lac_chan_vang.jpg', 1);
 
 INSERT INTO Nhan_vien (ma_nhan_vien, ho_ten,ngay_sinh,ngay_bat_dau,mat_khau, gioi_tinh, so_dt, dia_chi, email, id_chuc_vu, trang_thai) 
 VALUES

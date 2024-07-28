@@ -60,7 +60,7 @@ public class repo_voucher {
                 + "    ngay_bat_dau,\n"
                 + "    ngay_ket_thuc,\n"
                 + "    hinh_thuc_giam,\n"
-                + "    trang_thai\n"
+                + "    trang_thai,\n"
                 + "    giam_gia\n"
                 + ")\n"
                 + "VALUES\n"
@@ -72,7 +72,7 @@ public class repo_voucher {
                 + "    ?, -- ngay_bat_dau - date\n"
                 + "    ?, -- ngay_ket_thuc - date\n"
                 + "    ?, -- hinh_thuc_giam - nvarchar(50)\n"
-                + "    ?  -- trang_thai - int\n"
+                + "    ?,  -- trang_thai - int\n"
                 + "    ?  -- giam_gia - int\n"
                 + "    )";
         try {
@@ -104,7 +104,7 @@ public class repo_voucher {
                 + "    ngay_bat_dau = ?,      -- date\n"
                 + "    ngay_ket_thuc = ?,     -- date\n"
                 + "    hinh_thuc_giam = ?,    -- nvarchar(50)\n"
-                + "    trang_thai = ?         -- int\n"
+                + "    trang_thai = ?,         -- int\n"
                 + "    giam_gia = ?         -- int\n"
                 + "WHERE \n"
                 + "    ma_voucher = ?         -- varchar(10)";

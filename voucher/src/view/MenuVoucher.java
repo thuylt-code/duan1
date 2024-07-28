@@ -14,8 +14,15 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import entity.Voucher;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
 import logic.RandomStringGenerator;
 import repository.repo_voucher;
@@ -52,6 +59,30 @@ public class MenuVoucher extends javax.swing.JInternalFrame {
         for (String i : cboxSearchItems) {
             cboxSearchVoucher.addItem(i);
         }
+        
+        cboxHinhThucGiam.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if ( cboxHinhThucGiam.getSelectedIndex() == 1 ) {
+                    txtMucGiam.setLabelText("Mức giảm (%)");
+                }
+                else {
+                    txtMucGiam.setLabelText("Mức giảm (VND)");
+                }
+            }
+        });
+    }
+    
+    public static String tachSo(String chuoi) {
+        StringBuilder soChuoi = new StringBuilder();
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(chuoi);
+        
+        while (matcher.find()) {
+            soChuoi.append(matcher.group());
+        }
+        
+        return soChuoi.toString();
     }
 
     public void loadListVoucherToTable() {
@@ -72,7 +103,7 @@ public class MenuVoucher extends javax.swing.JInternalFrame {
                 default:
                     throw new AssertionError();
             };
-            String mucGiam = formatMucGiam(i.getMucGia(), i.getGioiHanGiamToiDa());
+            String mucGiam = formatMucGiam(i.getMucGia());
             if (rdConHang.isSelected() && i.getTrangThai() == 1) {
                 model.addRow(new Object[]{
                     i.getMaVoucher(), i.getTenVoucher(), i.getSoLuongVoucher(), i.getGioiHanGiamToiThieu(), i.getGioiHanGiamToiDa(), mucGiam, dateStart, dateEnd, i.getHinhThucGiam(), trangThai});
@@ -86,9 +117,9 @@ public class MenuVoucher extends javax.swing.JInternalFrame {
         }
     }
 
-    public String formatMucGiam(int mucGiam, double gioiHanGiamGiaToiDa) {
+    public String formatMucGiam(int mucGiam) {
         if (mucGiam <= 100) {
-            return mucGiam + "% cua " + gioiHanGiamGiaToiDa;
+            return mucGiam + "%";
         } else {
             return mucGiam + "VND";
         }
@@ -135,16 +166,18 @@ public class MenuVoucher extends javax.swing.JInternalFrame {
         Validate validate = new Validate();
         validate.khongDuocTrong(txtTenVoucher, txtMucGiam, txtGioiHanGiamToiThieu, txtGioiHanGiamToiDa, txtSoLuong);
         validate.chiDuocChuaSo(txtMucGiam, txtGioiHanGiamToiThieu, txtGioiHanGiamToiDa, txtSoLuong);
+        validate.phaiLonHon0(txtMucGiam, txtSoLuong, txtGioiHanGiamToiThieu, txtGioiHanGiamToiDa);
         if (cboxHinhThucGiam.getSelectedIndex() == 0) {
             validate.mucGiamTheoSoTienPhaiLonHon1000VND(txtMucGiam);
         } else {
             validate.mucGiamTheoPhanTramPhaiLonHon0VaBeHon100(txtMucGiam);
         }
+        validate.soThuNhatPhaiNhoHonSoThuHai(txtGioiHanGiamToiDa, txtGioiHanGiamToiThieu);
+        validate.soThuNhatPhaiNhoHonSoThuHai(txtMucGiam, txtGioiHanGiamToiDa);
         validate.khongDuocTrong("Thời gian bắt đầu", dateLocNgayBatDau.getDate() + "");
         validate.khongDuocTrong("Thời gian kết thúc", dateLocNgayKetThuc.getDate() + "");
         validate.checkDateIsAfterOrEqualCurrent(dateLocNgayBatDau);
         validate.checkDateIsBefore(dateLocNgayBatDau, dateLocNgayKetThuc);
-        validate.phaiLonHon0(txtGioiHanGiamToiDa, txtGioiHanGiamToiThieu, txtMucGiam, txtMucGiam);
         return validate;
     }
 
@@ -531,7 +564,7 @@ public class MenuVoucher extends javax.swing.JInternalFrame {
         txtGioiHanGiamToiThieu.setText(voucher.getGioiHanGiamToiThieu() + "");
         dateLocNgayBatDau.setDate(voucher.getNgayBatDau());
         dateLocNgayKetThuc.setDate(voucher.getNgayKetThuc());
-        txtMucGiam.setText(formatMucGiam(voucher.getMucGia(), voucher.getGioiHanGiamToiDa()));
+        txtMucGiam.setText(tachSo(voucher.getMucGia() + ""));
         txtSoLuong.setText(voucher.getSoLuongVoucher() + "");
         cboxSearchVoucher.setSelectedItem(voucher.getHinhThucGiam());
     }//GEN-LAST:event_tblVoucherMouseClicked
@@ -587,6 +620,7 @@ public class MenuVoucher extends javax.swing.JInternalFrame {
         dateLocNgayBatDau.setDate(null);
         dateLocNgayKetThuc.setDate(null);
         txtMucGiam.setText("");
+        txtSoLuong.setText("");
     }//GEN-LAST:event_btnResetActionPerformed
 
 

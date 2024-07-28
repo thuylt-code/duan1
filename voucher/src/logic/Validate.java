@@ -179,8 +179,8 @@ public class Validate {
         try {
             double n1 = Double.parseDouble(textField1.getText());
             double n2 = Double.parseDouble(textField2.getText());
-            if (n1 < n2) {
-                listWarning.put("So lon hon", textField1.getLabelText() + " phải lớn hơn " + textField2.getLabelText());
+            if (n1 > n2) {
+                listWarning.put(textField1.getLabelText() + textField2.getLabelText(), textField1.getLabelText() + " phải nho hon" + textField2.getLabelText());
                 chuoiHopLe = false;
             }
         } catch (Exception e) {

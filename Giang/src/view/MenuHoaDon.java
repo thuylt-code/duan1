@@ -28,7 +28,44 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
         this.loadTable();
         
     }
-    private void searchTable(ArrayList<HoaDon> results) {
+    private void fillHD() {
+        Integer trangThai = null;
+        if (cbbLocTrangThai.getSelectedItem().equals("Đã hủy")) {
+            trangThai = 0;
+        } else if (cbbLocTrangThai.getSelectedItem().equals("Đã thanh toán")) {
+            trangThai = 1;
+        } else if (cbbLocTrangThai.getSelectedItem().equals("Chờ thanh toán")) {
+            trangThai = 2;
+        }
+        String hinhThucTT = null;
+        if (!cbbHinhThucTT.getSelectedItem().equals("Tất cả")) {
+            hinhThucTT = cbbHinhThucTT.getSelectedItem().toString();
+        }
+        Double tongTienMin = null;
+        Double tongTienMax = null;
+        String tongTien = cbbTongTien.getSelectedItem().toString();
+        if (tongTien.equals("0 - 1 triệu")) {
+            tongTienMax = 1000000.0;
+        } else if (tongTien.equals("1 triệu - 5 triệu")){
+            tongTienMin = 1000000.0;
+            tongTienMax = 5000000.0;
+        } else if (tongTien.equals("Trên 5 triệu")) {
+            tongTienMin = 5000000.0;
+        }
+        Integer thang = null;
+        String thangSelected = cbbThang.getSelectedItem().toString();
+        if (!thangSelected.equals("Tất cả")) {
+            thang = Integer.parseInt(thangSelected);
+        }
+        Integer nam = null;
+        String namSelected = cbbThang.getSelectedItem().toString();
+        if (!namSelected.equals("Tất cả")) {
+            nam = Integer.parseInt(namSelected);
+        }
+        ArrayList<HoaDon> fillHD = hdRepo.fillHoaDon(trangThai, hinhThucTT, tongTienMin, tongTienMax, thang, nam);
+        updateTable(fillHD);
+    }
+    private void updateTable(ArrayList<HoaDon> results) {
         DefaultTableModel dtm = (DefaultTableModel) this.tblHoaDon.getModel();
         dtm.setRowCount(0);
         for(HoaDon hd :results) {
@@ -117,37 +154,7 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
             dtm.addRow(rowData);
         }
     }
-    private void filterTable(ArrayList<HoaDon> results) {
-        DefaultTableModel dtm = (DefaultTableModel) this.tblHoaDon.getModel();
-        dtm.setRowCount(0);
-        for(HoaDon hd :results) {
-            String trangThai;
-            if (hd.getTrangThai()==0) {
-                trangThai = "Đã hủy";
-            } else if (hd.getTrangThai()==1) {
-                trangThai = "Đã thanh toán";
-            }else {
-                trangThai = "Chờ thanh toán";
-            }
-            String tenNV = hdRepo.getTenNV(hd.getIdNV());
-            Double giaTriVoucher = hdRepo.getGiaTriVoucher(hd.getIdVoucher());
-            Object[] rowData = {
-                hd.getId(),
-                hd.getMa(),
-                tenNV,
-                hd.getIdKH(),
-                hd.getTen(),
-                hd.getDiaChi(),
-                hd.getSdt(),
-                hd.getNgay(),
-                hd.getTongTien(),
-                hd.getHinhThucTT(),
-                giaTriVoucher,
-                trangThai,
-            };
-            dtm.addRow(rowData);
-        }
-    }
+
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -176,7 +183,7 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
         cbbTongTien = new javax.swing.JComboBox<>();
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        cbbThanhToan = new javax.swing.JComboBox<>();
+        cbbHinhThucTT = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -226,8 +233,13 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel7.setText("Tháng:");
 
-        cbbThang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12" }));
+        cbbThang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" }));
         cbbThang.setPreferredSize(new java.awt.Dimension(90, 30));
+        cbbThang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbbThangActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel8.setText("Năm:");
@@ -308,8 +320,13 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel6.setText("Tổng tiền:");
 
-        cbbTongTien.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "0 - 500.000", "500.000 - 1 triệu", "1 triệu - 2 triệu", "2 triệu - 5 triệu", "Trên 5 triệu" }));
+        cbbTongTien.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "0 - 1 triệu", "1 triệu - 5 triệu", "Trên 5 triệu" }));
         cbbTongTien.setPreferredSize(new java.awt.Dimension(200, 30));
+        cbbTongTien.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbbTongTienActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -338,11 +355,11 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setText("Hình thức thanh toán:");
 
-        cbbThanhToan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Tiền mặt", "Chuyển khoản" }));
-        cbbThanhToan.setPreferredSize(new java.awt.Dimension(200, 30));
-        cbbThanhToan.addActionListener(new java.awt.event.ActionListener() {
+        cbbHinhThucTT.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tất cả", "Tiền mặt", "Chuyển khoản" }));
+        cbbHinhThucTT.setPreferredSize(new java.awt.Dimension(200, 30));
+        cbbHinhThucTT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbbThanhToanActionPerformed(evt);
+                cbbHinhThucTTActionPerformed(evt);
             }
         });
 
@@ -353,7 +370,7 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbbThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbbHinhThucTT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
@@ -363,7 +380,7 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbbThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cbbHinhThucTT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
@@ -504,44 +521,38 @@ public class MenuHoaDon extends javax.swing.JInternalFrame {
 
     private void cbbLocTrangThaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbLocTrangThaiActionPerformed
         // TODO add your handling code here:
-        int trangThai;
-        String trangThaiStr = (String) cbbLocTrangThai.getSelectedItem();
-        if ("Tất cả".equals(trangThaiStr)) {
-            this.loadTable();
-        } else {
-            if ("Chờ thanh toán".equals(trangThaiStr)) {
-                trangThai = 2;
-            } else if ("Đã thanh toán".equals(trangThaiStr)) {
-                trangThai = 1;
-            } else {
-                trangThai = 0;
-            }
-            ArrayList<HoaDon> rs = hdRepo.filterTrangThai(trangThai);
-            filterTable(rs);
-        }
+        this.fillHD();
     }//GEN-LAST:event_cbbLocTrangThaiActionPerformed
 
     private void txtSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyTyped
         // TODO add your handling code here:
         String keyword = txtSearch.getText().trim();
         ArrayList<HoaDon> results = hdRepo.search(keyword);
-        searchTable(results);
+        updateTable(results);
     }//GEN-LAST:event_txtSearchKeyTyped
 
-    private void cbbThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbThanhToanActionPerformed
+    private void cbbHinhThucTTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbHinhThucTTActionPerformed
         // TODO add your handling code here:
-//        String hinhThucTT = (String) cbbThanhToan.getSelectedItem();
-//        ArrayList<HoaDon> rs = hdRepo.filterHinhThucThanhToan(hinhThucTT);
-//            filterTable(rs);
-//        
-    }//GEN-LAST:event_cbbThanhToanActionPerformed
+        this.fillHD();
+       
+    }//GEN-LAST:event_cbbHinhThucTTActionPerformed
+
+    private void cbbTongTienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbTongTienActionPerformed
+        // TODO add your handling code here:
+        this.fillHD();
+    }//GEN-LAST:event_cbbTongTienActionPerformed
+
+    private void cbbThangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbThangActionPerformed
+        // TODO add your handling code here:
+        this.fillHD();
+    }//GEN-LAST:event_cbbThangActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbbHinhThucTT;
     private javax.swing.JComboBox<String> cbbLocTrangThai;
     private javax.swing.JComboBox<String> cbbNam;
     private javax.swing.JComboBox<String> cbbThang;
-    private javax.swing.JComboBox<String> cbbThanhToan;
     private javax.swing.JComboBox<String> cbbTongTien;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

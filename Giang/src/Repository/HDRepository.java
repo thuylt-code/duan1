@@ -10,6 +10,7 @@ package Repository;
  */
 import entity.HoaDon;
 import entity.HoaDonChiTiet;
+import java.awt.List;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -79,12 +80,12 @@ public class HDRepository {
     public ArrayList<HoaDon> search(String keyword) {
         ArrayList<HoaDon> listHD = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM Hoa_don WHERE ma_hoa_don LIKE ? OR ten_khach_hang LIKE ? OR so_dt LIKE ? ";
+            String sql = "SELECT * FROM Hoa_don WHERE ma_hoa_don LIKE ? OR ten_khach_hang LIKE ? OR so_dt LIKE ?";
             PreparedStatement ps = conn.prepareStatement(sql);
-            String key = "%" +keyword+ "%";
-            ps.setString(1, key);
-            ps.setString(2, key);
-            ps.setString(3, key);
+                String key = "%" +keyword+ "%";
+                ps.setObject(1, key);
+                ps.setObject(2, key);
+                ps.setObject(3, key);
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
                 int id = rs.getInt("ID");
@@ -107,33 +108,72 @@ public class HDRepository {
         }
         return listHD;
     }
-    public ArrayList<HoaDon> filterTrangThai(int trangThai) {
+    public ArrayList<HoaDon> fillHoaDon(Integer trangThai, String hinhThucTT, Double tongTienMin, Double tongTienMax, Integer thang, Integer nam) {
         ArrayList<HoaDon> listHD = new ArrayList<>();
-        String sql = "SELECT * FROM Hoa_don WHERE trang_thai = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, trangThai);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
-                int id = rs.getInt("ID");
-                String ma = rs.getString("ma_hoa_don");
-                int idKH = rs.getInt("id_khach_hang");
-                int idNV = rs.getInt("id_nhan_vien");
-                String ten = rs.getString("ten_khach_hang");
-                String diaChi = rs.getString("dia_chi_khach_hang");
-                String sdt = rs.getString("so_dt");
-                String ngay = rs.getString("ngay_tao");
-                Double tongTien = rs.getDouble("tong_tien");
-                String hinhThucTT = rs.getString("hinh_thuc_thanh_toan");
-                int idVoucher = rs.getInt("id_voucher");
-                trangThai = rs.getInt("trang_thai");
-                HoaDon hd = new HoaDon(id, ma, idKH, idNV, ten, diaChi, sdt, ngay, tongTien, hinhThucTT, idVoucher, trangThai);
-                listHD.add(hd);
+        StringBuilder sql = new StringBuilder("SELECT * FROM Hoa_don WHERE 1=1");
+        if (trangThai != null) {
+            sql.append(" AND trang_thai = ?");
+        }
+        if (hinhThucTT != null && !hinhThucTT.isEmpty()) {
+            sql.append(" AND hinh_thuc_thanh_toan = ?");
+        }
+        if (tongTienMin != null) {
+            sql.append(" AND tong_tien > ?");
+        }
+        if (tongTienMax != null) {
+            sql.append(" AND tong_tien <= ?");
+        }
+        if (thang != null) {
+            sql.append(" AND MONTH(ngay_tao) = ?");
+        }
+        if (nam != null) {
+            sql.append(" AND YEAR(ngay_tao) = ?");
+        }
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int i = 1;
+            if (trangThai != null) {
+                ps.setInt(i++, trangThai);
+            }
+            if (hinhThucTT != null && !hinhThucTT.isEmpty()) {
+                ps.setString(i++, hinhThucTT);
+            }
+            if (tongTienMin != null) {
+                ps.setDouble(i++, tongTienMin);
+            }
+            if (tongTienMax != null) {
+                ps.setDouble(i++, tongTienMax);
+            }
+            if (thang != null) {
+                ps.setInt(i++, thang);
+            }
+            if (nam != null) {
+                ps.setInt(i++, nam);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    HoaDon hd = new HoaDon();
+                    hd.setId(rs.getInt("ID"));
+                    hd.setMa(rs.getString("ma_hoa_don"));
+                    hd.setIdKH(rs.getInt("id_khach_hang"));
+                    hd.setIdNV(rs.getInt("id_nhan_vien"));
+                    hd.setTen(rs.getString("ten_khach_hang"));
+                    hd.setDiaChi(rs.getString("dia_chi_khach_hang"));
+                    hd.setSdt(rs.getString("so_dt"));
+                    hd.setNgay(rs.getString("ngay_tao"));
+                    hd.setTongTien(rs.getDouble("tong_tien"));
+                    hd.setHinhThucTT(rs.getString("hinh_thuc_thanh_toan"));
+                    hd.setIdVoucher(rs.getInt("id_voucher"));
+                    hd.setTrangThai(rs.getInt("trang_thai"));
+                    listHD.add(hd);
+                }
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
-        return listHD;
-    }
+            return listHD;
+        }
+
     
     public String getTenNV(int idNV) {
         String tenNV ="";

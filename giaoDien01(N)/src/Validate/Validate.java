@@ -4,6 +4,10 @@
  */
 package Validate;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,15 +28,32 @@ public class Validate {
     }
 
     public boolean checkEmail(String email) {
-        String regex = "^\\w+[a-z0-9]*@{1}+gmail.com$";
+        String regex = "^[a-zA-Z][a-zA-z0-9]+@[a-zA-Z]+(\\.[a-zA-Z]+){1,3}$";
 
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(email);
-        if(!m.find()){
+        if (!m.find()) {
             return false;
         }
         return true;
     }
+
+    public boolean checkDate(Date ngay) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    
+    try {
+        LocalDate dateOfBirth = ngay.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate today = LocalDate.now();
+        
+        if (dateOfBirth.isAfter(today)) {
+            return false;
+        } else {
+            return true;
+        }
+    } catch (Exception ex) {
+        return false;
+    }
+}
     
     
 

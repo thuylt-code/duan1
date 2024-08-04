@@ -4,6 +4,7 @@
  */
 package view;
 
+import Validate.Validate;
 import java.awt.HeadlessException;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 import java.sql.SQLException;
@@ -90,12 +91,13 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         txtSdt.setText("");
         txtDiaChi.setText("");
         txtEmail.setText("");
-
+        txtNgaySinh.setDate(null);
+        buttonGroup1.clearSelection();
+        buttonGroup2.clearSelection();
     }
 
     
     private boolean check() {
-
         if (txtMaKH.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Kiểm tra lại Mã Nhân Viên!");
             return false;
@@ -114,6 +116,9 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         } else if (!vali.checkEmail(txtEmail.getText().trim())) {
             JOptionPane.showMessageDialog(this, "Kiểm tra lại Email !");
             return false;
+        }else if (!vali.checkSdt(txtSdt.getText().trim()) ){
+            JOptionPane.showMessageDialog(this,"Kiểm tra lại số điện thoại !");
+            return false;
         }
         return true;
     }
@@ -128,6 +133,8 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -187,12 +194,16 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel8.setText("Email");
 
+        buttonGroup1.add(rdonam);
         rdonam.setText("Nam");
 
+        buttonGroup1.add(rdonu);
         rdonu.setText("Nữ");
 
+        buttonGroup2.add(rdoon);
         rdoon.setText("Còn hoạt động");
 
+        buttonGroup2.add(rdooff);
         rdooff.setText("Ngưng hoạt động");
 
         txtDiaChi.setColumns(20);
@@ -458,10 +469,16 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         
        try {
         if (!check()) {
-            return; 
+            return;
         }
 
-        kh.setMaKH(txtMaKH.getText());
+        String maKH = txtMaKH.getText();
+        if (khService.isMaKHExist(maKH)) {
+            JOptionPane.showMessageDialog(this, "Mã khách hàng đã tồn tại!");
+            return;
+        }
+
+        kh.setMaKH(maKH);
         kh.setTenKH(txtTenKH.getText());
         kh.setGioiTinh(rdonam.isSelected());
         kh.setSdt(txtSdt.getText());
@@ -470,7 +487,7 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         if (txtNgaySinh.getDate() != null) {
             kh.setNgaySinh(new java.sql.Date(txtNgaySinh.getDate().getTime()));
         } else {
-            kh.setNgaySinh(null); 
+            kh.setNgaySinh(null);
         }
         kh.setTrangThai(rdoon.isSelected() ? 1 : 0);
 
@@ -490,11 +507,12 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
             kh.getNgaySinh(),
             kh.getTrangThai() == 1 ? "Còn hoạt động" : "Ngưng hoạt động"
         });
-        clearForm(); // Xóa form sau khi thêm
+        clearForm();
     } catch (Exception e) {
         e.printStackTrace();
         JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi thêm khách hàng.");
     }
+
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void btnSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSuaActionPerformed
@@ -503,10 +521,17 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         if (!check()) {
             return; 
         }
+        
 
         int selectedRow = tblKhachHang.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng cần cập nhật.");
+            return;
+        }
+
+        String maKH = txtMaKH.getText();
+        if (khService.isMaKHExist(maKH) && !maKH.equals(tblKhachHang.getValueAt(selectedRow, 1))) {
+            JOptionPane.showMessageDialog(this, "Mã khách hàng đã tồn tại!");
             return;
         }
 
@@ -534,14 +559,15 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         model.setValueAt(kh.getTenKH(), selectedRow, 2);
         model.setValueAt(kh.getGioiTinh() ? "Nam" : "Nữ", selectedRow, 3);
         model.setValueAt(kh.getSdt(), selectedRow, 4);
-        model.setValueAt(kh.getDiaChi(), selectedRow, 5);
-        model.setValueAt(kh.getEmail(), selectedRow, 6);
+        model.setValueAt(kh.getEmail(), selectedRow, 5);
+        model.setValueAt(kh.getDiaChi(), selectedRow, 6);
         model.setValueAt(kh.getNgaySinh(), selectedRow, 7);
         model.setValueAt(kh.getTrangThai() == 1 ? "Còn hoạt động" : "Ngưng hoạt động", selectedRow, 8);
     } catch (Exception e) {
         e.printStackTrace();
         JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật khách hàng.");
     }
+
         
     }//GEN-LAST:event_btnSuaActionPerformed
 
@@ -570,6 +596,7 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
         e.printStackTrace();
         JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi tìm kiếm khách hàng.");
     }
+
         
     }//GEN-LAST:event_btnTimKiemActionPerformed
 
@@ -584,6 +611,8 @@ public class MenuKhachHang extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnSua;
     private javax.swing.JButton btnThem;
     private javax.swing.JButton btnTimKiem;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

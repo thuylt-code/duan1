@@ -4,6 +4,7 @@
  */
 package view;
 
+import Validate.Validate;
 import model.ChucVu;
 import repository.NhanVienResp;
 import java.util.List;
